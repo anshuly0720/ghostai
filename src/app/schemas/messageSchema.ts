@@ -6,3 +6,5 @@ export const messageSchema = z.object({
     .min(10,{message:"Message must be at least 10 characters long"})
     .max(1000,{message:"Message must be less than 1000 characters long"})
 })
+
+//Constraints: Enforces that messages aren't too short (spam) or too long (database bloat).

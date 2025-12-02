@@ -1,0 +1,7 @@
+Why do I need Zod?"
+
+Fail Fast: Mongoose only errors when you try to save to the DB. Zod catches the error immediately when the request hits your server. This saves resources.
+
+Sanitization: Zod can clean data (like trimming spaces) before your code even touches it.
+
+Type Safety: Zod integrates with TypeScript to ensure your API inputs exactly match your expectations

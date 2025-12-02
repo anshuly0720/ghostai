@@ -5,6 +5,7 @@ export const usernameValidation = z
     .min(2,"Username must be at least 2 characters long")
     .max(20,"Username must be less than 20 characters long")
     .regex(/^[a-zA-Z0-9]+$/,"Username must contain only letters and numbers")
+    .trim(); //removes whitespace from start and end of the string
 
 
 export const emailValidation = z
@@ -25,3 +26,12 @@ export const signUpSchema = z.object({
     password:passwordValidation,
 })
 
+
+
+// this file handles user registration.
+
+// Modularity: You exported usernameValidation separately. This is smart because you might need to check just a username (e.g., during a "check availability" feature) without checking the whole form.
+
+// emailValidation: Uses Zod's built-in email regex.
+
+// passwordValidation: Uses a complex Regex to enforce security (One upper, one lower, one number, one special char).

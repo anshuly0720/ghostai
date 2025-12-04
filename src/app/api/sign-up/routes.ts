@@ -3,11 +3,17 @@ import UserModel from "@/app/models/user.models";
 import bcrypt from "bcryptjs";
 import { sendVerificationEmail } from "@/app/helpers/sendVerificationEmail";
 import { success } from "zod";
+import { signUpSchema } from "@/app/schemas/signUpSchema";
 
 
 export async function POST(request:Request) {
+    // db connected immediately
+    await dbConnect();
+
     try {
         const {username,email,password} = await request.json()
+
+        //checks exisiting verified user by username
         const existingUserVerifiedByUsername = await UserModel.
         findOne({
             username,
@@ -22,12 +28,16 @@ export async function POST(request:Request) {
             )
         }
 
+        //check existing user by email
         const existingUserByEmail = await UserModel.
         findOne({
             email
         });
-
+        
+        //generates a 6 digit code
         const verifyCode = Math.floor(100000+Math.random()*900000).toString();
+        const expiryDate = new Date();
+        expiryDate.setHours(expiryDate.getHours()+1);
 
         if(existingUserByEmail){
             if(existingUserByEmail.isVerified){
@@ -36,17 +46,16 @@ export async function POST(request:Request) {
                     message: "User alr exists with this email"
                 },{status:400})
             }else{
+                //update existing unverified user
                 const hashpassword = await bcrypt.hash(password,10);
                 existingUserByEmail.password = hashpassword;
                 existingUserByEmail.verifyCode = verifyCode;
-                existingUserByEmail.verifyCodeExpires = new Date(Date.now()+360000);
+                existingUserByEmail.verifyCodeExpires = expiryDate;
                 await existingUserByEmail.save()
             }
         }else{
+            //creates new user
             const hashpassword = await bcrypt.hash(password,10);
-            const expiryDate =  new Date();
-            expiryDate.setHours(expiryDate.getHours()+1);
-
             const newUser = new UserModel({
                 username,
                 email,
@@ -92,6 +101,6 @@ export async function POST(request:Request) {
         {
             status: 500
         }
-    )
+    );
     }
 }
